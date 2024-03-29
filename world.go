@@ -1,13 +1,13 @@
 package main
 
-type Board [cols][rows]bool
+type World [cols][rows]bool
 
-func (board *Board) alive(i, j int) {
-	board[i][j] = true
+func (world *World) alive(i, j int) {
+	world[i][j] = true
 }
 
-func (board *Board) kill(i, j int) {
-	board[i][j] = false
+func (world *World) kill(i, j int) {
+	world[i][j] = false
 }
 
 var dirs = [8][2]int{
@@ -21,7 +21,7 @@ var dirs = [8][2]int{
 	{1, 1},   // bottom right
 }
 
-func (board *Board) liveNeighborCount(i, j int) int {
+func (world *World) liveNeighborCount(i, j int) int {
 	count := 0
 	for _, dir := range dirs {
 		if i <= 0 && dir[0] == -1 ||
@@ -30,25 +30,25 @@ func (board *Board) liveNeighborCount(i, j int) int {
 			j >= rows-1 && dir[1] == 1 {
 			continue
 		}
-		if board[i+dir[0]][j+dir[1]] {
+		if world[i+dir[0]][j+dir[1]] {
 			count++
 		}
 	}
 	return count
 }
 
-func (board *Board) update() {
-	var newBoard [cols][rows]bool
-	for i := range board {
-		for j := range board[0] {
-			newBoard[i][j] = board[i][j]
-			liveNeighbors := board.liveNeighborCount(i, j)
+func (world *World) update() {
+	var newWorld [cols][rows]bool
+	for i := range world {
+		for j := range world[0] {
+			newWorld[i][j] = world[i][j]
+			liveNeighbors := world.liveNeighborCount(i, j)
 			if liveNeighbors < 2 || liveNeighbors > 3 {
-				newBoard[i][j] = false
+				newWorld[i][j] = false
 			} else if liveNeighbors == 3 {
-				newBoard[i][j] = true
+				newWorld[i][j] = true
 			}
 		}
 	}
-	*board = newBoard
+	*world = newWorld
 }

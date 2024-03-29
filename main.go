@@ -23,7 +23,7 @@ const (
 )
 
 type Game struct {
-	board Board
+	world World
 	pause bool
 }
 
@@ -42,20 +42,20 @@ func (g *Game) Update() error {
 				return nil
 			}
 			if leftMousePressed {
-				g.board.alive(
+				g.world.alive(
 					cursorx/cellWidth,
 					cursory/cellWidth,
 				)
 			}
 			if rightMousePressed {
-				g.board.kill(
+				g.world.kill(
 					cursorx/cellWidth,
 					cursory/cellWidth,
 				)
 			}
 		}
 	} else {
-		g.board.update()
+		g.world.update()
 		time.Sleep((1000 / fps) * time.Millisecond)
 	}
 	return nil
@@ -66,7 +66,7 @@ func (g *Game) Draw(screen *ebiten.Image) {
 
 	for i := range cols {
 		for j := range rows {
-			if g.board[i][j] {
+			if g.world[i][j] {
 				vector.DrawFilledRect(
 					screen,
 					float32(i*cellWidth), float32(j*cellWidth), float32(cellWidth), float32(cellWidth),
@@ -109,7 +109,7 @@ func main() {
 			rle = append(rle, sc.Text())
 		}
 
-		game.board = parseRle(strings.Join(rle, ""))
+		game.world = parseRle(strings.Join(rle, ""))
 
 		file.Close()
 	}
