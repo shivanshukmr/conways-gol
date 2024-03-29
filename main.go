@@ -1,8 +1,11 @@
 package main
 
 import (
+	"bufio"
 	"image/color"
 	"log"
+	"os"
+	"strings"
 	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
@@ -11,7 +14,8 @@ import (
 )
 
 const (
-	cellWidth    = 20
+	fps          = 100
+	cellWidth    = 2
 	windowHeight = 900
 	windowWidth  = 1500
 	rows         = windowHeight / cellWidth
@@ -52,7 +56,7 @@ func (g *Game) Update() error {
 		}
 	} else {
 		g.board.update()
-		time.Sleep(50 * time.Millisecond)
+		time.Sleep((1000 / fps) * time.Millisecond)
 	}
 	return nil
 }
@@ -82,9 +86,36 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeigh
 func main() {
 	game := &Game{pause: true}
 
+	if len(os.Args) > 1 {
+		file, err := os.Open(os.Args[1])
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		var line string
+		sc := bufio.NewScanner(file)
+
+		for sc.Scan() {
+			line = sc.Text()
+			if line[0] != '#' && line[0] != ' ' && line[0] != '\t' {
+				break
+			}
+		}
+		// check pattern with boundaries
+		// log.Println(sc.Text())
+
+		var rle []string
+		for sc.Scan() {
+			rle = append(rle, sc.Text())
+		}
+
+		game.board = parseRle(strings.Join(rle, ""))
+
+		file.Close()
+	}
+
 	ebiten.SetWindowSize(windowWidth, windowHeight)
 	ebiten.SetWindowTitle("Conway's Game of Life")
-	ebiten.SetWindowFloating(true)
 
 	if err := ebiten.RunGame(game); err != nil {
 		log.Fatal(err)
