@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"github.com/hajimehoshi/ebiten/v2/vector"
 )
 
@@ -23,7 +24,32 @@ type Game struct {
 }
 
 func (g *Game) Update() error {
+	if inpututil.IsKeyJustPressed(ebiten.KeySpace) {
+		g.pause = !g.pause
+	}
+
 	if g.pause {
+		leftMousePressed := ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft)
+		rightMousePressed := ebiten.IsMouseButtonPressed(ebiten.MouseButtonRight)
+
+		if leftMousePressed || rightMousePressed {
+			cursorx, cursory := ebiten.CursorPosition()
+			if cursorx < 0 || cursorx > windowWidth-1 || cursory < 0 || cursory > windowHeight-1 {
+				return nil
+			}
+			if leftMousePressed {
+				g.board.alive(
+					cursorx/cellWidth,
+					cursory/cellWidth,
+				)
+			}
+			if rightMousePressed {
+				g.board.kill(
+					cursorx/cellWidth,
+					cursory/cellWidth,
+				)
+			}
+		}
 	} else {
 		g.board.update()
 		time.Sleep(50 * time.Millisecond)
@@ -64,4 +90,3 @@ func main() {
 		log.Fatal(err)
 	}
 }
-

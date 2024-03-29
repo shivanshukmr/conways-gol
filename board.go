@@ -52,4 +52,3 @@ func (board *Board) update() {
 	}
 	*board = newBoard
 }
-
