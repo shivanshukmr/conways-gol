@@ -14,8 +14,8 @@ import (
 )
 
 const (
-	fps          = 100
-	cellWidth    = 2
+	fps          = 20
+	cellWidth    = 15
 	windowHeight = 900
 	windowWidth  = 1500
 	rows         = windowHeight / cellWidth
